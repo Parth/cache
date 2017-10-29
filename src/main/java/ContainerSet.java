@@ -1,9 +1,11 @@
+import java.util.LinkedList;
+
 public abstract class ContainerSet<K,V> {
 	private Container<K, V>[] containers;
 	private int size;
 
-	public class ContainerSet(int slots) {
-		containers = new Container<>[slots];
+	public ContainerSet(int slots) {
+		containers = new Container[slots];
 	}
 
 	public void insert(K k, V v, boolean dirty) {
@@ -40,7 +42,18 @@ public abstract class ContainerSet<K,V> {
 		return null;
 	}
 
-	public int evict();
+	public LinkedList<Container<K, V>> getDirtyElements() {
+		LinkedList<Container<K, V>> returnValue = new LinkedList<>();
+		for (Container<K, V> c : containers) {
+			if (c.dirty) {
+				returnValue.add(c);
+			}
+		}
+
+		return returnValue;
+	}
+
+	public abstract int evict();
 
 	public Container<K, V>[] getContainers() {
 		return containers;

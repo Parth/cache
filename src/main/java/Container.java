@@ -1,8 +1,8 @@
 public class Container<K,V>{
 	public K key;
 	public V value; 
-	private long last_accessed;
-	private boolean dirty;
+	public long last_accessed;
+	public boolean dirty;
 
 	public Container(K key, V value, boolean dirty) {
 		this.key = key; 
