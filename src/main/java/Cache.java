@@ -1,40 +1,48 @@
+import java.lang.reflect.InvocationTargetException;
+
 public class Cache<K, V> {
 
 	private DataStore<K, V> dataStore;
 	private ContainerSet<K, V>[] containerSets;
 
 	public Cache(int buckets, int slots) {
-		this.containerSets = new ContainerSet[buckets];
-		for (int i = 0; i < containerSets.length; i++) {
-			this.containerSets[i] = new LRUContainerSet(slots);
-		}
-
-		this.dataStore = new NoDataStore();
+		this(buckets, slots, new NoDataStore());
 	}
 
 	public Cache(int buckets, int slots, DataStore dataStore) {
-		this(buckets, slots);
 		this.dataStore = dataStore;
+		containerSets = new ContainerSet[buckets];
+		for (int i = 0; i < containerSets.length; i++) {
+			containerSets[i] = new LRUContainerSet(slots);
+		}
 	}
 
-	public Cache(ContainerSet<K, V>[] containerSets, int buckets, int slots, DataStore<K, V> dataStore) {
-		this(buckets, slots, dataStore);
-		this.containerSets = containerSets;
+	public Cache(Class containerSet, int buckets, int slots, DataStore<K, V> dataStore) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+		this.dataStore = dataStore;
+		
+		containerSets = new ContainerSet[buckets];
+		for (int i = 0; i < containerSets.length; i++) {
+			containerSets[i] = (ContainerSet<K, V>) containerSet.getDeclaredConstructor(Integer.class).newInstance(slots);
+		}
+	}
+
+	public int hash(K k) {
+		return Math.abs(k.hashCode());
 	}
 
 	public void put(K k, V v) {
-		ContainerSet<K, V> c = containerSets[ k.hashCode() % containerSets.length ];
-		c.insert(k, v, true);
+		ContainerSet<K, V> c = containerSets[ hash(k) % containerSets.length ];
+		c.insert(k, v, true, dataStore);
 	}
 
 	public V get(K k) {
-		ContainerSet<K, V> c = containerSets[ k.hashCode() % containerSets.length ];
+		ContainerSet<K, V> c = containerSets[ hash(k) % containerSets.length ];
 		V v = c.get(k);
 
 		if (v == null) {
 			v = dataStore.get(k);
 			if (v != null) {
-				c.insert(k, v, false);
+				c.insert(k, v, false, dataStore);
 			}
 		}
 
@@ -56,5 +64,14 @@ public class Cache<K, V> {
 	@Override
 	public void finalize() {
 		writeAllToDataStore();
+	}
+
+	@Override
+	public String toString() {
+		String returnValue = "";
+		for (ContainerSet<K, V> cs : containerSets) {
+			returnValue += cs.toString() + "\n";
+		}
+		return returnValue;
 	}
 }

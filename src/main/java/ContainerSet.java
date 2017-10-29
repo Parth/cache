@@ -4,17 +4,22 @@ public abstract class ContainerSet<K,V> {
 	private Container<K, V>[] containers;
 	private int size;
 
-	public ContainerSet(int slots) {
+	public ContainerSet(Integer slots) {
 		containers = new Container[slots];
 	}
 
-	public void insert(K k, V v, boolean dirty) {
+	public int insert(K k, V v, boolean dirty) {
+		return insert(k, v, dirty, new NoDataStore());
+	}
+
+	public int insert(K k, V v, boolean dirty, DataStore dataStore) {
 		for (int i = 0; i < containers.length; i++) {
 			if (containers[i] != null) {
 				if (containers[i].key.equals(k)) {
 					containers[i].value = v;
+					containers[i].dirty = true;
 					containers[i].updateTime();
-					return;
+					return i;
 				}
 			}
 		}
@@ -22,6 +27,13 @@ public abstract class ContainerSet<K,V> {
 		int index = 0;
 		if (size == containers.length) { 
 			index = evict();
+
+			if (containers[index].dirty) {
+				dataStore.put(containers[index].key, containers[index].value);
+			}
+
+			containers[index] = null;
+			size--;
 		} else {
 			for (int i = 0; i < containers.length; i++) {	
 				if (containers[i] == null) { 
@@ -30,13 +42,21 @@ public abstract class ContainerSet<K,V> {
 				}
 			}
 		}
-		containers[index] = new Container<>(k, v, dirty);
+
+		size++;
+		containers[index] = new Container(k, v, dirty);
+		containers[index].updateTime();
+		return index;
 	}
 
 	public V get(K key) {
 		for (Container<K, V> c : containers) {
-			if (c.key.equals(key))
-				return c.value;
+			if (c != null) {
+				if (c.key.equals(key)) {
+					c.updateTime();
+					return c.value;
+				}
+			}
 		}
 
 		return null;
@@ -45,7 +65,7 @@ public abstract class ContainerSet<K,V> {
 	public LinkedList<Container<K, V>> getDirtyElements() {
 		LinkedList<Container<K, V>> returnValue = new LinkedList<>();
 		for (Container<K, V> c : containers) {
-			if (c.dirty) {
+			if (c != null && c.dirty) {
 				returnValue.add(c);
 			}
 		}
@@ -57,5 +77,22 @@ public abstract class ContainerSet<K,V> {
 
 	public Container<K, V>[] getContainers() {
 		return containers;
+	}
+
+	public int size() {
+		return size;
+	}
+
+	@Override
+	public String toString() {
+		String returnValue = "";
+		for (int i = 0; i < containers.length; i++) {
+			if (containers[i] != null) {
+				if (i != 0) returnValue += ", ";
+				returnValue += "[" + containers[i].key.toString() + "->" + containers[i].value.toString() + ", " + containers[i].last_accessed + ", " + containers[i].dirty + "]";
+			}
+		}
+
+		return returnValue;
 	}
 }

@@ -1,11 +1,14 @@
 public class MRUContainerSet<K, V> extends ContainerSet<K, V> {
 
-	public MRUContainerSet(int slots) {
+	public MRUContainerSet(Integer slots) {
 		super(slots);
 	}
 
 	@Override
 	public int evict() {
+		if (size() < getContainers().length) 
+			return -1;
+
 		Container<K, V>[] containers = super.getContainers();
 		int index = 0;
 		long max = 0;
@@ -17,7 +20,6 @@ public class MRUContainerSet<K, V> extends ContainerSet<K, V> {
 			}
 		}
 
-		containers[index] = null;
 		return index;
 	}
 

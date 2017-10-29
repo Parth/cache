@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="CacheTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-10-29T18:32:56" hostname="pm-ubuntu" time="0.004">
+  <properties/>
+  <testcase name="testBasicCache" classname="CacheTest" time="0.002"/>
+  <testcase name="testCustomReplacementPolicy" classname="CacheTest" time="0.001"/>
+  <system-out><![CDATA[[four->4, 15602220959685, true], [five->5, 15602220960678, true]
+[six->6, 15602220967392, true], [two->2, 15602220953716, true]
+[three->3, 15602220955783, true]
+
+[four->4, 15602220959685, true], [five->5, 15602220960678, true]
+[six->6, 15602220967392, true], [one->1, 15602221913111, true]
+[three->3, 15602220955783, true]
+
+[four->4, 15602220959685, true], [five->5, 15602220960678, true]
+[six->6, 15602220967392, true], [one->1, 15602221913111, true]
+[three->3, 15602220955783, true]
+
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
