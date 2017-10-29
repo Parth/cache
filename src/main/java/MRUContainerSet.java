@@ -1,9 +1,19 @@
+/**
+ * @author Parth Mehrotra <parth@mehrotra.me>
+ *
+ * A ContainerSet that models the MRU Replacement Policy
+ */
 public class MRUContainerSet<K, V> extends ContainerSet<K, V> {
 
 	public MRUContainerSet(Integer slots) {
 		super(slots);
 	}
 
+	/**
+	 * Evict an element based on it's last_accessed time
+	 *
+	 * @return index of the element with the largest (most recent) time
+	 */
 	@Override
 	public int evict() {
 		if (size() < getContainers().length) 

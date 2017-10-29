@@ -1,9 +1,19 @@
+/**
+ * @author Parth Mehrotra <parth@mehrotra.me>
+ *
+ * A ContainerSet that models the LRU Replacement Policy
+ */
 public class LRUContainerSet<K, V> extends ContainerSet<K, V> {
 
-	public LRUContainerSet(int slots) {
+	public LRUContainerSet(Integer slots) {
 		super(slots);
 	}
 
+	/**
+	 * Evict an element based on it's last_accessed time
+	 *
+	 * @return index of the element with the smallest (most distant) time
+	 */
 	@Override
 	public int evict() {
 		if (size() < getContainers().length) 
