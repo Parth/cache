@@ -5,7 +5,7 @@ import java.util.LinkedList;
  * 
  * ContainerSet manages a Set of KeyValue pairs.
  * It's responsible for doing all store/retrieval opperations, as well as
- * handling any eviction events. Upon eviction, if it evects a "Dirty" (see Container.java)
+ * handling any eviction events. Upon eviction, if it evicts a "Dirty" (see Container.java)
  * Container, it writes it to the DataStore.
  * All operations within this class are generally O(n), where n is the number of slots.
  */ 

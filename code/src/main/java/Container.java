@@ -14,7 +14,7 @@ public class Container<K,V>{
 	 *
 	 * @param key 
 	 * @param value
-	 * @param dirty indicates wether this element needs to be written to a dataStore during an eviction event or cache shutdown.
+	  @param dirty indicates whether this element needs to be written to a dataStore during an eviction event or cache shutdown.
 	 * 
 	 */
 	public Container(K key, V value, boolean dirty) {
