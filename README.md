@@ -51,3 +51,31 @@ compile 'com.TheTradeDesk.util:cache:1.0.0'
 ```
 
 to their `build.gradle`
+
+## Included in folder
+
+### Running the test suite
+
+Since this is a library, the only "executable" is the test suite. You can run that by invoking the gradle wrapper included in the source folder and passing the argument test:
+
+
+If gradle is installed:
+
+```
+gradle run
+```
+
+`*nix`:
+```
+./gradlew run
+```
+
+`Windows`:
+
+```
+gradle.bat run
+```
+
+### Documentation
+
+Test reports and javadoc web pages are in the `javadoc/` and the `test_report/` folder respectively.
