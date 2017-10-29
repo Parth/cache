@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="CacheTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-10-29T19:00:20" hostname="pm-ubuntu" time="0.007">
+<testsuite name="CacheTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-10-29T19:21:00" hostname="pm-ubuntu" time="0.004">
   <properties/>
-  <testcase name="testBasicCache" classname="CacheTest" time="0.006"/>
+  <testcase name="testBasicCache" classname="CacheTest" time="0.002"/>
   <testcase name="testCustomReplacementPolicy" classname="CacheTest" time="0.001"/>
-  <system-out><![CDATA[[four->4, 17246805036676, true], [five->5, 17246805037641, true]
-[six->6, 17246805044062, true], [two->2, 17246805030552, true]
-[three->3, 17246805032784, true]
+  <system-out><![CDATA[[four->4, 18486659136737, true], [five->5, 18486659137651, true]
+[six->6, 18486659144909, true], [two->2, 18486659129506, true]
+[three->3, 18486659131591, true]
 
-[four->4, 17246805036676, true], [five->5, 17246805037641, true]
-[six->6, 17246805044062, true], [one->1, 17246806122629, true]
-[three->3, 17246805032784, true]
+[four->4, 18486659136737, true], [five->5, 18486659137651, true]
+[six->6, 18486659144909, true], [one->1, 18486659790974, true]
+[three->3, 18486659131591, true]
 
-[four->4, 17246805036676, true], [five->5, 17246805037641, true]
-[six->6, 17246805044062, true], [one->1, 17246806122629, true]
-[three->3, 17246805032784, true]
+[four->4, 18486659136737, true], [five->5, 18486659137651, true]
+[six->6, 18486659144909, true], [one->1, 18486659790974, true]
+[three->3, 18486659131591, true]
 
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
