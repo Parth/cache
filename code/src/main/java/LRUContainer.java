@@ -7,6 +7,8 @@ public class LRUContainer<K, V> extends Container<K, V> {
 
 	public Long count = 0L;
 
+	LRUContainer() {}
+
 	public LRUContainer(K k, V v, boolean dirty) {
 		super(k, v, dirty);
 	}

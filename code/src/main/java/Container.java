@@ -8,6 +8,8 @@ public abstract class Container<K,V> implements Comparable<Container> {
 	public V value; 
 	public boolean dirty;
 
+	Container() {}
+
 	/**
 	 * Create a new Container with a key, value, dirty status.
 	 *
