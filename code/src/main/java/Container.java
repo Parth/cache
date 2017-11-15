@@ -25,5 +25,5 @@ public abstract class Container<K,V> implements Comparable<Container> {
 	/**
 	 * Update this Container's last_accessed time using System.nanoTime()
 	 */ 
-	public boolean update();
+	public abstract boolean update();
 }

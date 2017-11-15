@@ -1,4 +1,8 @@
+import java.lang.reflect.GenericDeclaration;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 
 /**
  * @author Parth Mehrotra <parth@mehrotra.me>
@@ -9,16 +13,18 @@ import java.util.LinkedList;
  * Container, it writes it to the DataStore.
  * All operations within this class are generally O(n), where n is the number of slots.
  */ 
-public abstract class ContainerSet<K,V> {
+public class ContainerSet<K,V> {
 	private PriorityQueue<Container<K, V>> containers;
 	private int size;
+	private Class containerClass;
 
 	/**
 	 * Create a new ContainerSet that holds n elements
 	 * @param slots, the maximum number of elements this collection can hold. Also the threshold for evict() events.
 	 */
-	public ContainerSet(Integer slots) {
+	public ContainerSet(Integer slots, Class containerClass) {
 		containers = new PriorityQueue<>(slots);
+		this.containerClass = containerClass;
 	}
 
 	/**
@@ -33,7 +39,7 @@ public abstract class ContainerSet<K,V> {
 	 * @param dirty wether this object needs to be written to the database.
 	 * @param dataStore for evicted data
 	 */
-	public int insert(K k, V v, boolean dirty, DataStore dataStore) {
+	public void insert(K k, V v, boolean dirty, DataStore dataStore) {
 		if (size == containers.size()) { // evict?
 			Container<K, V> container = containers.poll(); // O(log(n))
 
@@ -45,9 +51,17 @@ public abstract class ContainerSet<K,V> {
 		} 
 
 		size++;
-		containers.offer(new Container(k, v, dirty)); // O(log(n))
-		containers[index].updateTime();
-		return index; 
+		try {
+			containers.offer((Container<K, V>) containerClass.getDeclaredConstructor(GenericDeclaration.class, GenericDeclaration.class, Boolean.class).newInstance(k, v, dirty));
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		} // O(log(n))
 	}
 
 	/**
@@ -57,9 +71,9 @@ public abstract class ContainerSet<K,V> {
 	 * @return V or null if not in Set
 	 */
 	public V get(K key) {
-		Container ret = null;
+		Container<K, V> ret = null;
 		boolean wasUpdated = false;
-		Iterator it = containers.iterator();
+		Iterator<Container<K, V>> it = containers.iterator();
 
 		while (it.hasNext()) { // O(n)
 			Container c = it.next();
@@ -97,8 +111,8 @@ public abstract class ContainerSet<K,V> {
 	/**
 	 * @return all elements currently stored in the set
 	 */
-	public Container<K, V>[] getContainers() {
-		return containers.toArray();
+	public PriorityQueue<Container<K, V>> getContainers() {
+		return containers;
 	}
 
 	/**
@@ -110,14 +124,6 @@ public abstract class ContainerSet<K,V> {
 
 	@Override
 	public String toString() {
-		String returnValue = "";
-		for (int i = 0; i < containers.length; i++) {
-			if (containers[i] != null) {
-				if (i != 0) returnValue += ", ";
-				returnValue += "[" + containers[i].key.toString() + "->" + containers[i].value.toString() + ", " + containers[i].last_accessed + ", " + containers[i].dirty + "]";
-			}
-		}
-
-		return returnValue;
+		return containers.toString();
 	}
 }

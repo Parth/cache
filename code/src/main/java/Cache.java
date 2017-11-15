@@ -1,5 +1,3 @@
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * @author Parth Mehrotra <parth@mehrotra.me>
  *
@@ -33,27 +31,23 @@ public class Cache<K, V> {
 	 * @param dataStore dataStore the cache will talk to for persistence 
 	 */
 	public Cache(int buckets, int slots, DataStore dataStore) {
-		this.dataStore = dataStore;
-		containerSets = new ContainerSet[buckets];
-		for (int i = 0; i < containerSets.length; i++) {
-			containerSets[i] = new LRUContainerSet(slots);
-		}
+		this(LRUContainer.class, buckets, slots, dataStore);
 	}
 
 	/**
 	 * Create a cache with a datastore, and a custom replacement policy
 	 *
-	 * @param containerSet a Class refernce that inherits from ContainerSet with a custom evict() function. Will be instantiated through reflection
+	 * @param container a Class refernce that inherits from ContainerSet with a custom evict() function. Will be instantiated through reflection
 	 * @param buckets what all keys will be mod'd by.
 	 * @param slots how many slots per bucket.
 	 * @param dataStore dataStore the cache will talk to for persistence 
 	 */
-	public Cache(Class containerSet, int buckets, int slots, DataStore<K, V> dataStore) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	public Cache(Class container, int buckets, int slots, DataStore<K, V> dataStore) {
 		this.dataStore = dataStore;
 		
 		containerSets = new ContainerSet[buckets];
 		for (int i = 0; i < containerSets.length; i++) {
-			containerSets[i] = (ContainerSet<K, V>) containerSet.getDeclaredConstructor(Integer.class).newInstance(slots);
+			containerSets[i] = new ContainerSet(slots, container);
 		}
 	}
 
