@@ -6,7 +6,6 @@
 public class Container<K,V>{
 	public K key;
 	public V value; 
-	public long last_accessed;
 	public boolean dirty;
 
 	/**
@@ -26,7 +25,5 @@ public class Container<K,V>{
 	/**
 	 * Update this Container's last_accessed time using System.nanoTime()
 	 */ 
-	public void updateTime() {
-		last_accessed = System.nanoTime();
-	}
+	public boolean updateProperty();
 }
