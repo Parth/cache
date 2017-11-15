@@ -3,11 +3,16 @@
  *
  * A ContainerSet that models the MRU Replacement Policy
  */
-public class MRUContainerSet<K, V> extends ContainerSet<K, V> {
+public class MRUContainer<K, V> extends Container<K, V> {
 
-	public MRUContainerSet(Integer slots) {
-		super(slots);
+	private long usageCount = 0;
+
+	public MRUContainer(K key, V value, boolean dirty) {
+		super(key, value, dirty);
 	}
+
+	@Override 
+	public int compareTo(
 
 	/**
 	 * Evict an element based on it's last_accessed time

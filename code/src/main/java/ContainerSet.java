@@ -10,7 +10,7 @@ import java.util.LinkedList;
  * All operations within this class are generally O(n), where n is the number of slots.
  */ 
 public abstract class ContainerSet<K,V> {
-	private Container<K, V>[] containers;
+	private PriorityQueue<Container<K, V>> containers;
 	private int size;
 
 	/**
@@ -18,7 +18,7 @@ public abstract class ContainerSet<K,V> {
 	 * @param slots, the maximum number of elements this collection can hold. Also the threshold for evict() events.
 	 */
 	public ContainerSet(Integer slots) {
-		containers = new Container[slots];
+		containers = new PriorityQueue<>(slots);
 	}
 
 	/**
@@ -34,40 +34,18 @@ public abstract class ContainerSet<K,V> {
 	 * @param dataStore for evicted data
 	 */
 	public int insert(K k, V v, boolean dirty, DataStore dataStore) {
-		// Old key, new value?
-		for (int i = 0; i < containers.length; i++) {
-			if (containers[i] != null) {
-				if (containers[i].key.equals(k)) {
-					containers[i].value = v;
-					containers[i].dirty = true;
-					containers[i].updateTime();
-					return i;
-				}
-			}
-		}
+		if (size == containers.size()) { // evict?
+			Container<K, V> container = containers.poll(); // O(log(n))
 
-		// New Key, new Value
-		int index = 0;
-		if (size == containers.length) { // evict?
-			index = evict();
-
-			if (containers[index].dirty) { // write to datastore?
-				dataStore.put(containers[index].key, containers[index].value);
+			if (container.dirty) { // write to datastore?
+				dataStore.put(container.key, container.value);
 			}
 
-			containers[index] = null;
 			size--;
-		} else { // Use an empty slot
-			for (int i = 0; i < containers.length; i++) {	
-				if (containers[i] == null) { 
-					index = i;
-					break;
-				}
-			}
-		}
+		} 
 
 		size++;
-		containers[index] = new Container(k, v, dirty);
+		containers.offer(new Container(k, v, dirty)); // O(log(n))
 		containers[index].updateTime();
 		return index; 
 	}
@@ -79,16 +57,27 @@ public abstract class ContainerSet<K,V> {
 	 * @return V or null if not in Set
 	 */
 	public V get(K key) {
-		for (Container<K, V> c : containers) {
-			if (c != null) {
-				if (c.key.equals(key)) {
-					c.updateTime();
-					return c.value;
+		Container ret = null;
+		boolean wasUpdated = false;
+		Iterator it = containers.iterator();
+
+		while (it.hasNext()) { // O(n)
+			Container c = it.next();
+
+			if (c.key.equals(key)) {
+				ret = c;
+				wasUpdated = ret.update();
+				if (wasUpdated) {
+					it.remove(); // O(1) 
 				}
 			}
 		}
 
-		return null;
+		if (wasUpdated) {
+			containers.add(ret); // reinsert and let heap prioritize O(log(n))
+		}
+
+		return (ret == null) ? null : ret.value;
 	}
 
 	/**
@@ -97,7 +86,7 @@ public abstract class ContainerSet<K,V> {
 	public LinkedList<Container<K, V>> getDirtyElements() {
 		LinkedList<Container<K, V>> returnValue = new LinkedList<>();
 		for (Container<K, V> c : containers) {
-			if (c != null && c.dirty) {
+			if (c.dirty) {
 				returnValue.add(c);
 			}
 		}
@@ -106,16 +95,10 @@ public abstract class ContainerSet<K,V> {
 	}
 
 	/**
-	 * Function that computes which element needs to be evicted
-	 * @return index of next element to evict
-	 */
-	public abstract int evict();
-
-	/**
 	 * @return all elements currently stored in the set
 	 */
 	public Container<K, V>[] getContainers() {
-		return containers;
+		return containers.toArray();
 	}
 
 	/**
