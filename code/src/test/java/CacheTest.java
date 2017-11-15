@@ -62,30 +62,6 @@ public class CacheTest implements ResultShare<String, Integer> {
 		assertThat(puts.size(), is(3));
 	}
 
-	@Test
-	public void testCustomReplacementPolicy() {
-		try { 
-			Cache<String, Integer> cache = new Cache(BadReplacementPolicy.class, 3, 2, new NoDataStore());
-			cache.put("one", 1);
-			cache.put("two", 2);
-			cache.put("three", 3);
-
-			assertThat(cache.get("one"), is(1));
-			cache.put("four", 4);
-			cache.put("five", 5);
-			cache.put("six", 6);
-			assertNull(cache.get("one"));
-			System.out.println(cache);
-			cache.put("one", 1);
-			System.out.println(cache);
-			assertNull(cache.get("two"));
-			System.out.println(cache);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	@Override
 	public void notifyPut(String k, Integer v) {
 		puts.add(k);
